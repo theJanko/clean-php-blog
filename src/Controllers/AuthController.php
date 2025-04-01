@@ -4,14 +4,14 @@ namespace App\Controllers;
 
 class AuthController extends BaseController
 {
-    public function loginPage()
+    public function loginPage(): string
     {
         return $this->render('auth/login.twig', [
             'error' => $_SESSION['login_error'] ?? null
         ]);
     }
 
-    public function login()
+    public function login(): void
     {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
@@ -26,7 +26,7 @@ class AuthController extends BaseController
         $this->redirect('/login');
     }
 
-    public function logout()
+    public function logout(): void
     {
         session_destroy();
         $this->redirect('/login');
