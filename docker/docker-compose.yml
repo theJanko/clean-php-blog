@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  cgrd-nginx:
+    container_name: cgrd-nginx
+    image: nginx:alpine
+    ports:
+      - "8190:80"
+    volumes:
+      - ../:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - cgrd-network
+    depends_on:
+      - cgrd-php
+
+  cgrd-php:
+    container_name: cgrd-php
+    build: ./php
+    volumes:
+      - ../:/var/www/html
+    networks:
+      - cgrd-network
+    depends_on:
+      - cgrd-mysql
+
+  cgrd-mysql:
+    container_name: cgrd-mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: news_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3406:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cgrd-network
+
+volumes:
+  mysql_data:
+
+networks:
+  cgrd-network:
+    driver: bridge
