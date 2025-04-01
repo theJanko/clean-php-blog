@@ -9,13 +9,10 @@ class Database
 
     private function __construct()
     {
-        $host = 'cgrd-mysql';
-        $db   = 'news_db';
-        $user = 'user';
-        $pass = 'password';
-        $charset = 'utf8mb4';
+        $user = $_ENV['DB_USER'];
+        $pass = $_ENV['DB_PASSWORD'];
+        $dsn = $_ENV['DB_DSN'];
 
-        $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
         $options = [
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
