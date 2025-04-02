@@ -2,12 +2,14 @@
 
 namespace App\Core;
 
+use Twig\Environment;
+
 class Router
 {
     private $routes = [];
     private $twig;
 
-    public function __construct(\Twig\Environment $twig)
+    public function __construct(Environment $twig)
     {
         $this->twig = $twig;
     }

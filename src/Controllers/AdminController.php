@@ -6,7 +6,7 @@ use App\Models\Article;
 
 class AdminController extends BaseController
 {
-    private $article;
+    private Article $article;
 
     public function __construct(\Twig\Environment $twig)
     {
@@ -24,52 +24,26 @@ class AdminController extends BaseController
     public function createArticle(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $this->article->create([
+            $data = [
                 'title' => $_POST['title'] ?? '',
-                'content' => $_POST['content'] ?? ''
-            ]);
+                'description' => $_POST['description'] ?? ''
+            ];
 
-            if ($id) {
-                $_SESSION['success'] = 'Article created successfully!';
-            } else {
-                $_SESSION['error'] = 'Error creating article!';
-            }
-
-            if (
-                !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
-            ) {
-                echo json_encode(['success' => true]);
-                exit;
-            }
-
-            $this->redirect('/admin');
+            $id = $this->article->create($data);
+            $this->handleResponse($id, 'Article created successfully!', 'Error creating article!');
         }
     }
 
     public function editArticle(int $id): string
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $success = $this->article->update($id, [
+            $data = [
                 'title' => $_POST['title'] ?? '',
-                'content' => $_POST['content'] ?? ''
-            ]);
+                'description' => $_POST['description'] ?? ''
+            ];
 
-            if ($success) {
-                $_SESSION['success'] = 'Article updated successfully!';
-            } else {
-                $_SESSION['error'] = 'Error updating article!';
-            }
-
-            if (
-                !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
-            ) {
-                echo json_encode(['success' => true]);
-                exit;
-            }
-
-            $this->redirect('/admin');
+            $success = $this->article->update($id, $data);
+            $this->handleResponse($success, 'Article updated successfully!', 'Error updating article!');
         }
 
         $article = $this->article->getById($id);
@@ -84,12 +58,7 @@ class AdminController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             $success = $this->article->delete((int)$_POST['id']);
-
-            if ($success) {
-                $_SESSION['success'] = 'Article deleted successfully!';
-            } else {
-                $_SESSION['error'] = 'Error deleting article!';
-            }
+            $this->handleResponse($success, 'Article deleted successfully!', 'Error deleting article!');
         }
 
         $this->redirect('/admin');
@@ -99,5 +68,24 @@ class AdminController extends BaseController
     {
         $article = $this->article->getById($id);
         return json_encode($article ?: ['error' => 'Article not found']);
+    }
+
+    private function handleResponse($result, string $successMessage, string $errorMessage): void
+    {
+        if ($result) {
+            $_SESSION['success'] = $successMessage;
+        } else {
+            $_SESSION['error'] = $errorMessage;
+        }
+
+        if (
+            !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
+        ) {
+            echo json_encode(['success' => (bool)$result]);
+            exit;
+        }
+
+        $this->redirect('/admin');
     }
 }

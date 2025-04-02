@@ -1,68 +1,25 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <style>
-        .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .error-message {
-            color: #ff0000;
-            margin-bottom: 15px;
-        }
-        .submit-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .submit-button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.twig" %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="/css/login.css">
+{% endblock %}
+
+{% block description %}
     <div class="login-container">
-        <h2>CRDG</h2>
-        
         {% if error %}
-            <div class="error-message">{{ error }}</div>
+            <div class="error-message login-error">{{ error }}</div>
         {% endif %}
 
         <form action="/login" method="POST">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" class="login-input" placeholder="Username" required>
             </div>
 
             <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" class="login-input" placeholder="Password" required>
             </div>
 
             <button type="submit" class="submit-button">Login</button>
         </form>
     </div>
-</body>
-</html>
+{% endblock %}

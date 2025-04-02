@@ -1,36 +1,15 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>404 - Not Found</title>
-    <style>
-        .error-container {
-            text-align: center;
-            margin-top: 100px;
-        }
-        .error-code {
-            font-size: 72px;
-            color: #444;
-        }
-        .error-message {
-            font-size: 24px;
-            color: #666;
-        }
-        .back-link {
-            margin-top: 20px;
-            color: #0066cc;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.twig" %}
+
+{% block title %}404 - Not Found{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="/css/error.css">
+{% endblock %}
+
+{% block description %}
     <div class="error-container">
         <div class="error-code">404</div>
         <div class="error-message">Page not found</div>
         <a href="/" class="back-link">Back to home page</a>
     </div>
-</body>
-</html>
+{% endblock %}

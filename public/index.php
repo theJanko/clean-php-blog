@@ -9,7 +9,6 @@ ini_set('display_errors', 1);
 
 date_default_timezone_set('Europe/Warsaw');
 
-// Załaduj zmienne środowiskowe
 Config::load();
 
 if (session_status() === PHP_SESSION_NONE) {

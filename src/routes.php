@@ -10,12 +10,10 @@ $twig = new \Twig\Environment($loader);
 
 $router = new Router($twig);
 
-// Auth routes
 $router->add('GET', '/login', AuthController::class, 'loginPage');
 $router->add('POST', '/login', AuthController::class, 'login');
 $router->add('GET', '/logout', AuthController::class, 'logout');
 
-// Admin routes (protected)
 $router->add('GET', '/admin', AdminController::class, 'adminPage', [AuthMiddleware::class]);
 $router->add('GET', '/admin/article/create', AdminController::class, 'createArticle', [AuthMiddleware::class]);
 $router->add('POST', '/admin/article/create', AdminController::class, 'createArticle', [AuthMiddleware::class]);
