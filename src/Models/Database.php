@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Core\Config;
+
 class Database
 {
     private static $instance = null;
@@ -9,9 +11,9 @@ class Database
 
     private function __construct()
     {
-        $user = $_ENV['DB_USER'];
-        $pass = $_ENV['DB_PASSWORD'];
-        $dsn = $_ENV['DB_DSN'];
+        $dsn = Config::get('DB_DSN');
+        $user = Config::get('DB_USER');
+        $pass = Config::get('DB_PASSWORD');
 
         $options = [
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,

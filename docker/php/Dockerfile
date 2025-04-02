@@ -6,6 +6,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && docker-php-ext-install zip pdo pdo_mysql
 
+# Konfiguracja PHP
+RUN echo "variables_order = \"EGPCS\"" >> /usr/local/etc/php/conf.d/variables_order.ini
+
 # Instalacja Composera
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
