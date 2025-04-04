@@ -10,11 +10,13 @@
     <script src="/js/admin.js"></script>
 {% endblock %}
 
-{% block header %}
-    <h2>All News</h2>
-{% endblock %}
-
 {% block description %}
+    {% if articles is not empty %}
+        <div class="list-header">
+            <h2>All News</h2>
+        </div>
+    {% endif %}
+    
     <div class="articles-list">
         {% for article in articles %}
             <div class="article-item" data-id="{{ article.id }}">

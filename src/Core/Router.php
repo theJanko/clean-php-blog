@@ -4,15 +4,14 @@ namespace App\Core;
 
 use Twig\Environment;
 
-class Router
+final class Router
 {
-    private $routes = [];
-    private $twig;
+    /** @var array<array<string, mixed>> */
+    private array $routes = [];
 
-    public function __construct(Environment $twig)
-    {
-        $this->twig = $twig;
-    }
+    public function __construct(
+        private readonly Environment $twig
+    ) {}
 
     public function add(string $method, string $path, string $controller, string $action, array $middleware = []): void
     {
@@ -48,7 +47,6 @@ class Router
             if ($route['method'] === $method) {
                 $params = $this->matchRoute($uri, $route);
                 if ($params !== null) {
-
                     foreach ($route['middleware'] as $middlewareClass) {
                         $middleware = new $middlewareClass();
                         $middleware->handle();

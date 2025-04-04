@@ -1,3 +1,13 @@
+.list-header {
+    margin-bottom: 20px;
+}
+
+.list-header h2 {
+    margin: 0;
+    color: #16396b;
+    font-size: 24px;
+}
+
 .articles-list {
     margin-bottom: 40px;
 }
@@ -132,7 +142,7 @@
     flex-shrink: 0;
     display: flex;
     gap: 10px;
-    justify-description: flex-end;
+    justify-content: flex-end;
     align-self: flex-start;
 }
 
@@ -144,7 +154,7 @@
     border-radius: 50%;
     display: flex;
     align-items: center;
-    justify-description: center;
+    justify-content: center;
     transition: background-color 0.2s;
 }
 
@@ -169,14 +179,16 @@
 
 .form-header {
     display: flex;
-    justify-description: space-between;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .form-header h2 {
     margin: 0;
     color: #16396b;
+    flex: 1;
 }
 
 .cancel-btn {
@@ -187,8 +199,9 @@
     border-radius: 50%;
     display: flex;
     align-items: center;
-    justify-description: center;
+    justify-content: center;
     transition: background-color 0.2s;
+    margin-left: 15px;
 }
 
 .cancel-btn:hover {
@@ -296,7 +309,7 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-description: center;
+    justify-content: center;
     transition: transform 0.2s;
     margin-left: 8px;
 }

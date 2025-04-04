@@ -58,19 +58,33 @@ class ArticleManager {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
-            } else {
-                alert('Error deleting article!');
+        .then(response => {
+            // Sprawdź format odpowiedzi
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error(`Unexpected content type: ${contentType}`);
             }
+            
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.error || `HTTP error! Status: ${response.status}`);
+                });
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            if (!data.success && data.error) {
+                throw new Error(data.error);
+            }
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error deleting article!');
+            alert(`Error deleting article: ${error.message}`);
         });
     }
 
@@ -87,15 +101,24 @@ class ArticleManager {
         event.preventDefault();
         const formData = new FormData(event.target);
         
+        // Walidacja danych przed wysłaniem
+        const title = formData.get('title');
+        const description = formData.get('description');
+        
+        if (!title || title.trim() === '') {
+            alert('Title cannot be empty');
+            return;
+        }
+        
         let url, method;
         
         if (id) {
             url = `/admin/article/${id}`;
             method = 'PATCH';
-
+            
             const data = new URLSearchParams();
             for (const [key, value] of formData.entries()) {
-                data.append(key, value);
+                data.append(key, value.trim());
             }
             
             fetch(url, {
@@ -107,12 +130,25 @@ class ArticleManager {
                 body: data
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                // Sprawdź format odpowiedzi
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error(`Unexpected content type: ${contentType}`);
                 }
+                
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || `HTTP error! Status: ${response.status}`);
+                    });
+                }
+                
                 return response.json();
             })
             .then(data => {
+                if (!data.success && data.error) {
+                    throw new Error(data.error);
+                }
+                
                 const message = "News was successfully changed!";
                 sessionStorage.setItem('successMessage', message);
                 this.resetForm();
@@ -122,26 +158,45 @@ class ArticleManager {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error updating article!');
+                alert(`Error updating article: ${error.message}`);
             });
         } else {
             url = '/admin/article/create';
             method = 'POST';
-
+            
+            // Tworzymy nowy FormData z czystymi danymi
+            const cleanFormData = new FormData();
+            for (const [key, value] of formData.entries()) {
+                cleanFormData.append(key, value.trim());
+            }
+            
             fetch(url, {
                 method: method,
-                body: formData,
+                body: cleanFormData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                // Sprawdź format odpowiedzi
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error(`Unexpected content type: ${contentType}`);
                 }
+                
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || `HTTP error! Status: ${response.status}`);
+                    });
+                }
+                
                 return response.json();
             })
             .then(data => {
+                if (!data.success && data.error) {
+                    throw new Error(data.error);
+                }
+                
                 const message = "News was successfully created!";
                 sessionStorage.setItem('successMessage', message);
                 this.resetForm();
@@ -151,7 +206,7 @@ class ArticleManager {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error creating article!');
+                alert(`Error creating article: ${error.message}`);
             });
         }
     }

@@ -2,9 +2,10 @@
 
 namespace App\Core;
 
-class Config
+final class Config
 {
-    private static $config = [];
+    /** @var array<string, string> */
+    private static array $config = [];
 
     public static function load(): void
     {
@@ -12,12 +13,12 @@ class Config
             $lines = file(__DIR__ . '/../../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
             foreach ($lines as $line) {
-                if (strpos($line, '#') === 0 || empty($line)) {
+                if (str_starts_with($line, '#') || empty($line)) {
                     continue;
                 }
 
-                if (strpos($line, '=') !== false) {
-                    list($key, $value) = explode('=', $line, 2);
+                if (str_contains($line, '=')) {
+                    [$key, $value] = explode('=', $line, 2);
                     $key = trim($key);
                     $value = trim($value);
 
@@ -39,7 +40,7 @@ class Config
         }, $value);
     }
 
-    public static function get(string $key, $default = null)
+    public static function get(string $key, mixed $default = null): mixed
     {
         return self::$config[$key] ?? $default;
     }

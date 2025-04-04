@@ -2,21 +2,20 @@
 
 namespace App\Controllers;
 
+use Twig\Environment;
+
 abstract class BaseController
 {
-    protected $twig;
-
-    public function __construct(\Twig\Environment $twig)
-    {
-        $this->twig = $twig;
-    }
+    public function __construct(
+        protected readonly Environment $twig
+    ) {}
 
     protected function render(string $template, array $data = []): string
     {
         return $this->twig->render($template, $data);
     }
 
-    protected function redirect(string $path): void
+    protected function redirect(string $path): never
     {
         header("Location: $path");
         exit;

@@ -2,7 +2,7 @@
 
 namespace App\Middleware;
 
-class AuthMiddleware
+final class AuthMiddleware
 {
     public function handle(): void
     {

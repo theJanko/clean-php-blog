@@ -4,10 +4,10 @@ namespace App\Models;
 
 use App\Core\Config;
 
-class Database
+final class Database
 {
-    private static $instance = null;
-    private $conn;
+    private static ?self $instance = null;
+    private \PDO $conn;
 
     private function __construct()
     {
@@ -28,10 +28,10 @@ class Database
         }
     }
 
-    public static function getInstance(): Database
+    public static function getInstance(): self
     {
-        if (self::$instance == null) {
-            self::$instance = new Database();
+        if (self::$instance === null) {
+            self::$instance = new self();
         }
         return self::$instance;
     }

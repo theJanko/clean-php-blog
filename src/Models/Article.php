@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-class Article
+readonly class Article
 {
-    private \PDO $db;
     private const ALLOWED_FIELDS = ['title', 'description'];
+    private \PDO $db;
 
     public function __construct()
     {
@@ -22,13 +22,16 @@ class Article
     {
         $stmt = $this->db->prepare('SELECT * FROM articles WHERE id = ?');
         $stmt->execute([$id]);
-        $result = $stmt->fetch();
-        return $result ?: null;
+        return $stmt->fetch() ?: null;
     }
 
     public function create(array $data): int
     {
         $data = $this->sanitizeData($data);
+
+        if (empty($data['title'])) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
 
         $stmt = $this->db->prepare(
             'INSERT INTO articles (title, description, created_at) VALUES (?, ?, NOW())'
@@ -40,6 +43,10 @@ class Article
     public function update(int $id, array $data): bool
     {
         $data = $this->sanitizeData($data);
+
+        if (empty($data['title'])) {
+            throw new \InvalidArgumentException('Title cannot be empty');
+        }
 
         $stmt = $this->db->prepare(
             'UPDATE articles SET title = ?, description = ?, updated_at = NOW() WHERE id = ?'
@@ -58,7 +65,9 @@ class Article
         $sanitized = [];
 
         foreach (self::ALLOWED_FIELDS as $field) {
-            $sanitized[$field] = isset($data[$field]) ? trim($data[$field]) : '';
+            $sanitized[$field] = isset($data[$field]) && $data[$field] !== ''
+                ? trim($data[$field])
+                : '';
         }
 
         return $sanitized;
