@@ -23,11 +23,9 @@ class ArticleManager {
             
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const id = e.currentTarget.closest('.article-item').dataset.id;
-                    if (confirm('Are you sure you want to delete this news?')) {
-                        sessionStorage.setItem('successMessage', 'News was deleted!');
-                        this.deleteArticle(id);
-                    }
+                const id = e.currentTarget.closest('.article-item').dataset.id;
+                    sessionStorage.setItem('successMessage', 'News was deleted!');
+                    this.deleteArticle(id);
                 });
             });
             
@@ -53,18 +51,27 @@ class ArticleManager {
     }
 
     deleteArticle(id) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/admin/article/delete';
-        
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'id';
-        input.value = id;
-        
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
+        fetch(`/admin/article/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            } else {
+                alert('Error deleting article!');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting article!');
+        });
     }
 
     resetForm() {
@@ -79,21 +86,74 @@ class ArticleManager {
     handleSubmit(event, id = null) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        const url = id ? `/admin/article/edit/${id}` : '/admin/article/create';
         
-        fetch(url, {
-            method: 'POST',
-            body: formData
-        }).then(() => {
-            const message = id ? "News was successfully changed!" : "News was successfully created!";
+        let url, method;
+        
+        if (id) {
+            url = `/admin/article/${id}`;
+            method = 'PATCH';
+
+            const data = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                data.append(key, value);
+            }
             
-            sessionStorage.setItem('successMessage', message);
-            
-            this.resetForm();
-            setTimeout(() => {
-                window.location.reload();
-            }, 800);
-        });
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: data
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const message = "News was successfully changed!";
+                sessionStorage.setItem('successMessage', message);
+                this.resetForm();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 800);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating article!');
+            });
+        } else {
+            url = '/admin/article/create';
+            method = 'POST';
+
+            fetch(url, {
+                method: method,
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const message = "News was successfully created!";
+                sessionStorage.setItem('successMessage', message);
+                this.resetForm();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 800);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error creating article!');
+            });
+        }
     }
 
     showSuccessMessage(message) {

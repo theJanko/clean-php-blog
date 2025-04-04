@@ -48,7 +48,7 @@ class Router
             if ($route['method'] === $method) {
                 $params = $this->matchRoute($uri, $route);
                 if ($params !== null) {
-                    // Execute middleware
+
                     foreach ($route['middleware'] as $middlewareClass) {
                         $middleware = new $middlewareClass();
                         $middleware->handle();

@@ -36,10 +36,11 @@ class AdminController extends BaseController
 
     public function editArticle(int $id): string
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
+            parse_str(file_get_contents('php://input'), $patchData);
             $data = [
-                'title' => $_POST['title'] ?? '',
-                'description' => $_POST['description'] ?? ''
+                'title' => $patchData['title'] ?? '',
+                'description' => $patchData['description'] ?? ''
             ];
 
             $success = $this->article->update($id, $data);
@@ -54,10 +55,10 @@ class AdminController extends BaseController
         return json_encode($article);
     }
 
-    public function deleteArticle(): void
+    public function deleteArticle(int $id): void
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-            $success = $this->article->delete((int)$_POST['id']);
+        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+            $success = $this->article->delete($id);
             $this->handleResponse($success, 'Article deleted successfully!', 'Error deleting article!');
         }
 
@@ -82,6 +83,7 @@ class AdminController extends BaseController
             !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
         ) {
+            header('Content-Type: application/json');
             echo json_encode(['success' => (bool)$result]);
             exit;
         }
