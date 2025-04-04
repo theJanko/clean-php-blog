@@ -51,15 +51,17 @@ class ArticleManager {
     }
 
     deleteArticle(id) {
+        const csrfToken = document.getElementById('csrf_token').value;
+        
         fetch(`/admin/article/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
             }
         })
         .then(response => {
-            // Sprawdź format odpowiedzi
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
                 throw new Error(`Unexpected content type: ${contentType}`);
@@ -100,10 +102,10 @@ class ArticleManager {
     handleSubmit(event, id = null) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        
-        // Walidacja danych przed wysłaniem
+
         const title = formData.get('title');
         const description = formData.get('description');
+        const csrfToken = formData.get('csrf_token');
         
         if (!title || title.trim() === '') {
             alert('Title cannot be empty');
@@ -125,12 +127,12 @@ class ArticleManager {
                 method: method,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
                 },
                 body: data
             })
             .then(response => {
-                // Sprawdź format odpowiedzi
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
                     throw new Error(`Unexpected content type: ${contentType}`);
@@ -163,8 +165,7 @@ class ArticleManager {
         } else {
             url = '/admin/article/create';
             method = 'POST';
-            
-            // Tworzymy nowy FormData z czystymi danymi
+
             const cleanFormData = new FormData();
             for (const [key, value] of formData.entries()) {
                 cleanFormData.append(key, value.trim());
@@ -174,11 +175,11 @@ class ArticleManager {
                 method: method,
                 body: cleanFormData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
                 }
             })
             .then(response => {
-                // Sprawdź format odpowiedzi
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
                     throw new Error(`Unexpected content type: ${contentType}`);

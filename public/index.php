@@ -7,7 +7,6 @@ use App\Core\Config;
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-// Obsługa błędów dla żądań AJAX
 set_exception_handler(function (Throwable $e) {
     $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
         strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
@@ -23,7 +22,6 @@ set_exception_handler(function (Throwable $e) {
         exit;
     }
 
-    // Dla zwykłych żądań możemy wyświetlić szczegóły błędu
     echo '<h1>Application Error</h1>';
     echo '<p>' . $e->getMessage() . '</p>';
     echo '<p>File: ' . $e->getFile() . ' on line ' . $e->getLine() . '</p>';

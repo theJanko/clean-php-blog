@@ -55,6 +55,7 @@
         </div>
         <form id="articleForm" onsubmit="handleSubmit(event)">
             <input type="hidden" id="articleId" value="">
+            <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token }}">
             <div class="form-group">
                 <input type="text" id="title" name="title" placeholder="Title" required>
             </div>

@@ -17,8 +17,13 @@ class AdminController extends BaseController
 
     public function adminPage(): string
     {
+        if (!isset($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+
         return $this->render('admin/dashboard.twig', [
-            'articles' => $this->article->getAll()
+            'articles' => $this->article->getAll(),
+            'csrf_token' => $_SESSION['csrf_token']
         ]);
     }
 
@@ -26,6 +31,8 @@ class AdminController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
+                $this->verifyCsrfToken();
+
                 $data = [
                     'title' => $_POST['title'] ?? '',
                     'description' => $_POST['description'] ?? ''
@@ -54,6 +61,8 @@ class AdminController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
             try {
+                $this->verifyCsrfToken();
+
                 parse_str(file_get_contents('php://input'), $patchData);
                 $data = [
                     'title' => $patchData['title'] ?? '',
@@ -105,6 +114,8 @@ class AdminController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             try {
+                $this->verifyCsrfToken();
+
                 $success = $this->article->delete($id);
                 $this->handleResponse($success, 'Article deleted successfully!', 'Error deleting article!');
             } catch (\Throwable $e) {
@@ -166,5 +177,14 @@ class AdminController extends BaseController
         }
 
         $this->redirect('/admin');
+    }
+
+    private function verifyCsrfToken(): void
+    {
+        $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+
+        if (!$token || !isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
+            throw new \InvalidArgumentException('Błąd weryfikacji tokenu CSRF');
+        }
     }
 }
